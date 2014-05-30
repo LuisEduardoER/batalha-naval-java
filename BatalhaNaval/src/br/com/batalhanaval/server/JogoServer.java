@@ -1,5 +1,6 @@
 package br.com.batalhanaval.server;
 
+import java.awt.GridLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,8 +9,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import br.com.batalhanaval.client.MyLabel;
+
 public class JogoServer {
 	
+	private static Integer TAM_MATRIZ = 10; // Matriz de 10x10		
 	private String tabuleiroJogador1[][];
 	private String tabuleiroJogador2[][];
 
@@ -53,7 +57,17 @@ public class JogoServer {
 
 	}
 	
-	private Boolean iniciaJogo(){
+	private Boolean iniciaJogo(String tabuleiro){
+		
+		// cria nova matriz de 10x10		
+		String matriz[][] = new String[TAM_MATRIZ][TAM_MATRIZ];
+
+		// Monta o tabuleiro do jogador
+		for (int yy = 0; yy < TAM_MATRIZ; yy++)
+			for (int xx = 0; xx < TAM_MATRIZ; xx++) {			  
+				matriz[xx][yy] = new String();
+
+			}
 		
 		return true;
 	}
