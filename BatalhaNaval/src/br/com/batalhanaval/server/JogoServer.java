@@ -23,17 +23,25 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import br.com.batalhanaval.resources.Resource;
+
 import java.awt.Color;
 
 public class JogoServer extends JFrame {
 
-    JTextArea area;
-    JScrollPane scroll;
-    JButton btLimparLog;
+    private JTextArea area;
+    private JScrollPane scroll;
+    private JButton btLimparLog;
+    private JButton btnIniciarJogo;
+    private PrintWriter p;
+    private Scanner leitor;
+    
+    private static Integer TAM_MATRIZ = Resource.getTamMatriz(); // Matriz de 10x10	
+    private String matrizJogador1[][];
+    private String matrizJogador2[][];
 
-    PrintWriter p;
-    Scanner leitor;
-
+    // Listener Botões
     public class BtLimparLog implements ActionListener {
 
         @Override
@@ -42,6 +50,42 @@ public class JogoServer extends JFrame {
         	area.setText("");
         }
 
+    }
+    public class BtIniciarJogo implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+        	//startServer();
+        	iniciarPartida();
+        }
+
+    }
+    
+    // Gera os tabuleiros
+    public void iniciarPartida(){
+    	
+    	insereLog("Iniciando partida no servidor...");
+    	matrizJogador1 = getMatriz();
+    	matrizJogador2 = getMatriz();
+    	
+    	insereLog("Tabuleiro Gerado!");
+    	insereLog("Pronto para iniciar a partida!");
+    }
+    
+    public String[][] getMatriz(){
+    	
+    	// cria nova matriz de 10x10            
+        String matriz[][] = new String[TAM_MATRIZ][TAM_MATRIZ];
+
+        // Monta o tabuleiro do jogador
+        for (int yy = 0; yy < TAM_MATRIZ; yy++)
+                for (int xx = 0; xx < TAM_MATRIZ; xx++) {                         
+                        matriz[xx][yy] = new String();
+
+                }
+        
+        return matriz;
+    	
     }
 
     public JogoServer() {
@@ -68,6 +112,11 @@ public class JogoServer extends JFrame {
         p1.add(BorderLayout.EAST, btLimparLog);
 
         principal.add(BorderLayout.SOUTH, p1);
+        
+        btnIniciarJogo = new JButton("Iniciar Jogo");
+        btnIniciarJogo.addActionListener(new BtIniciarJogo());
+        btnIniciarJogo.setFont(font);
+        p1.add(btnIniciarJogo, BorderLayout.CENTER);
         principal.add(BorderLayout.CENTER, scroll);
 
         setSize(383, 366);
@@ -78,11 +127,14 @@ public class JogoServer extends JFrame {
         ServerSocket server;
         try {
             server = new ServerSocket(6543);
-            area.append("Iniciando Servidor .....\n");
-            area.append("Servidor Iniciado com sucesso!\n");
+            
+            insereLog("Iniciando Servidor....");
+            insereLog("Servidor iniciado com sucesso!");
+            
             while (true) {
             	
-            	area.append("Aguardando requisições...\n");
+            	insereLog("Aguardando requisições...");
+            	
                 Socket socket = server.accept();
                 new Thread(new EscutaMicro(socket)).start();
                 p = new PrintWriter(socket.getOutputStream());
@@ -93,6 +145,11 @@ public class JogoServer extends JFrame {
         }
 
         
+    }
+    
+    // Insere o texto no log
+    private void insereLog(String log){
+    	area.append(log+"\n");
     }
 
     public void retornaDadosCliente(String write) {
@@ -119,11 +176,13 @@ public class JogoServer extends JFrame {
 
             String l = leitor.nextLine();
             
-            area.append(l+"\n");
+            insereLog(l);
             
             String[] lsplit = l.split(";");
             procurarPermisao = lsplit[0];
             codigoDaPessoa = lsplit[1];
+            
+            insereLog("Atirou na posição: X:"+procurarPermisao+" - Y:"+codigoDaPessoa);
 
             switch (codigoDaPessoa) {
             case "001":

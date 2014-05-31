@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import java.awt.GridLayout;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
@@ -12,6 +13,8 @@ import javax.swing.JLabel;
 import java.awt.Font;
 
 import javax.swing.JButton;
+
+import br.com.batalhanaval.resources.Resource;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -26,7 +29,7 @@ import java.util.Random;
 public class Client extends JFrame {
 
 	private JPanel contentPane = new JPanel();
-	private static Integer TAM_MATRIZ = 10; // Matriz de 10x10		
+	private static Integer TAM_MATRIZ = Resource.getTamMatriz(); // Matriz de 10x10		
 	MyLabel matrizJogador1[][];
 	MyLabel matrizJogador2[][];
 
@@ -34,13 +37,17 @@ public class Client extends JFrame {
 	JPanel tabuleiroJogador2 = new JPanel();
 	
 	Socket s;
+	BufferedReader entrada;
+	PrintWriter saida;
 	
 	// Conecta no servidor via socket
-	private Boolean iniciaConexao(){
+	private Boolean iniciarConexao(){
 		// Conecta no servidor
 		try {
 			
 			s = new Socket("localhost", 6543);
+			entrada = new BufferedReader(new InputStreamReader(s.getInputStream()));
+			saida = new PrintWriter(s.getOutputStream());
 			
 			return true;
 			
@@ -58,16 +65,12 @@ public class Client extends JFrame {
 
 	private Boolean enviaDados(String dados){
 		
+		iniciarConexao();
 		// Verifica se está conectado ao servidor
-		if (s == null) return false;
+		if (!s.isConnected()) return false;
 		
 		try {
 			
-			// Busca streams de E/S
-			BufferedReader entrada = new BufferedReader(
-					new InputStreamReader(s.getInputStream()));
-			PrintWriter saida = new PrintWriter(s.getOutputStream());
-
 			// Envia dados atraves do Stream
 			saida.println(dados);
 			saida.flush();
@@ -153,7 +156,6 @@ public class Client extends JFrame {
 		setTitle("Batalha Naval");
 
 		reiniciarPartida();
-		iniciaConexao();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 616, 432);
@@ -201,16 +203,19 @@ public class Client extends JFrame {
 		contentPane.add(label_3);
 		
 		
-		
+					
 		JButton btnNewButton = new JButton("Atirar!");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				 // Seta a imagem de fundo
 				int vl1 = randInt(0, 9);
 				int vl2 = randInt(0, 9);
-				  matrizJogador1[vl1][vl2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/batalhanaval/resources/explosao3.jpg")));
+				 
+				matrizJogador1[vl1][vl2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/batalhanaval/resources/explosao3.jpg")));
 				
-				 enviaDados("JORGÃO DA BORRACHARIA!");
+				if(enviaDados(vl1+";"+vl2)){
+					JOptionPane.showMessageDialog(null, "Acertou!");
+				}
 				  
 			}
 		});
