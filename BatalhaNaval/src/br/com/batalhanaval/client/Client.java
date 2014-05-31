@@ -15,9 +15,15 @@ import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Random;
 
-public class Teste extends JFrame {
+public class Client extends JFrame {
 
 	private JPanel contentPane = new JPanel();
 	private static Integer TAM_MATRIZ = 10; // Matriz de 10x10		
@@ -26,6 +32,53 @@ public class Teste extends JFrame {
 
 	JPanel tabuleiroJogador1 = new JPanel();
 	JPanel tabuleiroJogador2 = new JPanel();
+	
+	Socket s;
+	
+	// Conecta no servidor via socket
+	private Boolean iniciaConexao(){
+		// Conecta no servidor
+		try {
+			
+			s = new Socket("localhost", 6543);
+			
+			return true;
+			
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return false;
+		
+	}
+
+	private Boolean enviaDados(String dados){
+		
+		// Verifica se está conectado ao servidor
+		if (s == null) return false;
+		
+		try {
+			
+			// Busca streams de E/S
+			BufferedReader entrada = new BufferedReader(
+					new InputStreamReader(s.getInputStream()));
+			PrintWriter saida = new PrintWriter(s.getOutputStream());
+
+			// Envia dados atraves do Stream
+			saida.println(dados);
+			saida.flush();
+			
+			return true;
+			
+		} catch (Exception e) {
+			return false;
+		}
+		
+	}
 	
 	public MyLabel[][] atualizaTabuleiro(JPanel tabuleiro){
 		// cria nova matriz de 10x10		
@@ -84,7 +137,7 @@ public class Teste extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Teste frame = new Teste();
+					Client frame = new Client();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -96,10 +149,11 @@ public class Teste extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public Teste() {
+	public Client() {
 		setTitle("Batalha Naval");
 
 		reiniciarPartida();
+		iniciaConexao();
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 616, 432);
@@ -155,7 +209,9 @@ public class Teste extends JFrame {
 				int vl1 = randInt(0, 9);
 				int vl2 = randInt(0, 9);
 				  matrizJogador1[vl1][vl2].setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/batalhanaval/resources/explosao3.jpg")));
-					
+				
+				 enviaDados("JORGÃO DA BORRACHARIA!");
+				  
 			}
 		});
 		btnNewButton.setBounds(23, 316, 89, 23);
