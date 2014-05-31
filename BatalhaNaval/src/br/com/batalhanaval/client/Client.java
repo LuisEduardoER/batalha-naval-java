@@ -29,7 +29,7 @@ import java.util.Random;
 public class Client extends JFrame {
 
 	private JPanel contentPane = new JPanel();
-	private static Integer TAM_MATRIZ = Resource.getTamMatriz(); // Matriz de 10x10		
+	private static Integer TAM_MATRIZ = Resource.getTAM_MATRIZ(); // Matriz de 10x10		
 	MyLabel matrizJogador1[][];
 	MyLabel matrizJogador2[][];
 

@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -24,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import br.com.batalhanaval.client.Jogador;
 import br.com.batalhanaval.resources.Resource;
 
 import java.awt.Color;
@@ -37,9 +39,13 @@ public class JogoServer extends JFrame {
     private PrintWriter p;
     private Scanner leitor;
     
-    private static Integer TAM_MATRIZ = Resource.getTamMatriz(); // Matriz de 10x10	
-    private String matrizJogador1[][];
-    private String matrizJogador2[][];
+    private static Integer TAM_MATRIZ = Resource.getTAM_MATRIZ(); // Matriz de 10x10	
+    private Integer matrizJogador1[][];
+    private Integer matrizJogador2[][];
+    
+    // Informações de cada jogador
+    private Jogador jogador1;
+    private Jogador jogador2;
 
     // Listener Botões
     public class BtLimparLog implements ActionListener {
@@ -57,6 +63,8 @@ public class JogoServer extends JFrame {
         public void actionPerformed(ActionEvent e) {
         	//startServer();
         	iniciarPartida();
+        	distribuirEmbarcacoes(matrizJogador1);
+        	distribuirEmbarcacoes(matrizJogador2);
         }
 
     }
@@ -68,26 +76,68 @@ public class JogoServer extends JFrame {
     	matrizJogador1 = getMatriz();
     	matrizJogador2 = getMatriz();
     	
+    	jogador1 = new Jogador();
+    	jogador2 = new Jogador();
+    	
     	insereLog("Tabuleiro Gerado!");
     	insereLog("Pronto para iniciar a partida!");
     }
     
-    public String[][] getMatriz(){
+    // Gera o tabuleiro
+    // Ao gerar o tabuleiro é setado ZERO em todas as celulas
+    public Integer[][] getMatriz(){
     	
     	// cria nova matriz de 10x10            
-        String matriz[][] = new String[TAM_MATRIZ][TAM_MATRIZ];
+        Integer matriz[][] = new Integer[TAM_MATRIZ][TAM_MATRIZ];
 
         // Monta o tabuleiro do jogador
         for (int yy = 0; yy < TAM_MATRIZ; yy++)
                 for (int xx = 0; xx < TAM_MATRIZ; xx++) {                         
-                        matriz[xx][yy] = new String();
-
+                        matriz[xx][yy] = new Integer(0);
+                        
+                        //insereLog(Integer.toString(matriz[xx][yy]));
+                        
                 }
         
         return matriz;
     	
     }
 
+    //Distribui os barcos no tabuleiro
+    public void distribuirEmbarcacoes(Integer tabuleiro[][]){
+    	// Na matriz caso a celula esteja com ZERO está vazia.
+    	
+    	// PORTA AVIÕES 	  = 1
+    	// FRAGATA			  = 2
+    	// TORPEDEIROS		  = 3
+    	// CONTRA-TORPEDEIROS = 4
+    	// SUBMARIO 		  = 5
+    	
+    	// POSICIONA O PORTA AVIÕES
+    	int X = randInt(0, 9);
+		int Y = randInt(0, 9);
+		
+		if(tabuleiro[X][Y] == 0){
+			insereLog("Posicionando o porta aviões na posição inicial: X:"+X+" - Y:"+Y);
+			
+			
+			
+		}
+    	
+    }
+    
+	public int randInt(int min, int max) {
+
+	    // Usually this can be a field rather than a method variable
+	    Random rand = new Random();
+
+	    // nextInt is normally exclusive of the top value,
+	    // so add 1 to make it inclusive
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+
+	    return randomNum;
+	}
+    
     public JogoServer() {
 
         super("Servidor: Controle do acesso");
@@ -119,7 +169,7 @@ public class JogoServer extends JFrame {
         p1.add(btnIniciarJogo, BorderLayout.CENTER);
         principal.add(BorderLayout.CENTER, scroll);
 
-        setSize(383, 366);
+        setSize(462, 366);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
 
@@ -152,6 +202,7 @@ public class JogoServer extends JFrame {
     	area.append(log+"\n");
     }
 
+    // Envia dados para o cliente
     public void retornaDadosCliente(String write) {
         p.println(write);
         p.flush();
