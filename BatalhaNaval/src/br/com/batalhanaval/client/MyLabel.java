@@ -4,24 +4,33 @@ import javax.swing.JLabel;
 
 /*
  * Essa classe foi extendida de Jlabel para montar o ambiente
- * o atributo flag serve para identificar se é agente, lixeira organico,
- * lixeira seco, lixo seco ou lixo organico.
+ * os atributos coluna e linha indicam a posição do componente
+ * na matriz.
+ * Serve para que ao clicar seja possível pegar a posição e enviar
+ * para o servidor
  * */
 
 public class MyLabel extends JLabel {
 
-	private String flag = "";
+	private Integer coluna;
+	private Integer linha;
 	
-	public String getFlag() {
-		return flag;
+	public Integer getcoluna() {
+		return coluna;
 	}
-
-	public void setFlag(String flag) {
-		if(flag != null)
-			this.flag = flag;
-		else
-			this.flag = "";
+	public void setcoluna(Integer coluna) {
+		this.coluna = coluna;
 	}
+	public Integer getlinha() {
+		return linha;
+	}
+	public void setlinha(Integer linha) {
+		this.linha = linha;
+	}
+	
 
+	
+	
+	
 	
 }

@@ -35,7 +35,6 @@ public class JogoServer extends JFrame {
     private JTextArea area;
     private JScrollPane scroll;
     private JButton btLimparLog;
-    private JButton btnIniciarJogo;
     private PrintWriter p;
     private Scanner leitor;
     
@@ -54,17 +53,6 @@ public class JogoServer extends JFrame {
         public void actionPerformed(ActionEvent e) {
         	//startServer();
         	area.setText("");
-        }
-
-    }
-    public class BtIniciarJogo implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-        	//startServer();
-        	iniciarPartida();
-        	distribuirEmbarcacoes(matrizJogador1);
-        	distribuirEmbarcacoes(matrizJogador2);
         }
 
     }
@@ -162,11 +150,6 @@ public class JogoServer extends JFrame {
         p1.add(BorderLayout.EAST, btLimparLog);
 
         principal.add(BorderLayout.SOUTH, p1);
-        
-        btnIniciarJogo = new JButton("Iniciar Jogo");
-        btnIniciarJogo.addActionListener(new BtIniciarJogo());
-        btnIniciarJogo.setFont(font);
-        p1.add(btnIniciarJogo, BorderLayout.CENTER);
         principal.add(BorderLayout.CENTER, scroll);
 
         setSize(462, 366);
@@ -210,9 +193,11 @@ public class JogoServer extends JFrame {
 
     public class EscutaMicro implements Runnable {
 
-        String procurarPermisao;
-        String codigoDaPessoa;
-        String nomeDaPessoa;
+    	//O Servidor recebe 3 parâmetros separados por ponto e vírgula
+    	//Ex.: INICIAR;0;0 - TIRO;4;5
+        String param1;
+        String param2;
+        String param3;
 
         public EscutaMicro(Socket socket) {
             try {
@@ -230,34 +215,22 @@ public class JogoServer extends JFrame {
             insereLog(l);
             
             String[] lsplit = l.split(";");
-            procurarPermisao = lsplit[0];
-            codigoDaPessoa = lsplit[1];
+            param1 = lsplit[0]; // comando
+            param2 = lsplit[1];
+            param3 = lsplit[2];
             
-            insereLog("Atirou na posição: X:"+procurarPermisao+" - Y:"+codigoDaPessoa);
+            //insereLog("Atirou na posição: X:"+procurarPermisao+" - Y:"+codigoDaPessoa);
 
-            switch (codigoDaPessoa) {
-            case "001":
-                nomeDaPessoa = "Edmilson";
+            switch (param1) {
+            case "INICIAR":
+            	iniciarPartida();
+            	distribuirEmbarcacoes(matrizJogador1);
+            	distribuirEmbarcacoes(matrizJogador2);
                 break;
-            case "002":
-                nomeDaPessoa = "Dayvson";
+            case "TIRO":
+                //nomeDaPessoa = "Dayvson";
                 break;
-            case "003":
-                nomeDaPessoa = "Anderson";
-                break;
-            case "004":
-                nomeDaPessoa = "Wesley";
-                break;
-            case "005":
-                nomeDaPessoa = "Nilo";
-                break;
-            case "006":
-                nomeDaPessoa = "Neto";
-                break;
-            case "007":
-                nomeDaPessoa = "Jeferson";
-                break;
-
+            
             default:
                 break;
             }
