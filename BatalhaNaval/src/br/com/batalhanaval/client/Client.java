@@ -43,6 +43,8 @@ public class Client extends JFrame {
 	BufferedReader entrada;
 	PrintWriter saida;
 	
+	JLabel qtdTiro = new JLabel("0");
+	
 	// Conecta no servidor via socket
 	private Boolean iniciarConexao(){
 		// Conecta no servidor
@@ -66,11 +68,11 @@ public class Client extends JFrame {
 		
 	}
 
-	private Boolean enviaDados(String dados){
+	private Integer enviaDados(String dados){
 		
 		iniciarConexao();
 		// Verifica se está conectado ao servidor
-		if (!s.isConnected()) return false;
+		//if (!s.isConnected()) return false;
 		
 		try {
 			
@@ -78,12 +80,32 @@ public class Client extends JFrame {
 			saida.println(dados);
 			saida.flush();
 			
-			return true;
+			// Recebe o retorno do servidor
+			return retornaDados();
+
+			
+			//return true;
 			
 		} catch (Exception e) {
-			return false;
+			//return false;
+		}
+		return null;
+		
+	}
+	
+	private Integer retornaDados(){
+		// Imprime retorno
+		String linha = null;
+		try {
+			linha = entrada.readLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
+		System.out.println(linha);
+		
+		return Integer.parseInt(linha);
 	}
 	
 	public MyLabel[][] atualizaTabuleiro(JPanel tabuleiro){
@@ -122,11 +144,16 @@ public class Client extends JFrame {
 			            // Seta a imagem de fundo
 						int linha = matriz.getlinha();
 						int coluna = matriz.getcoluna();
-						 
-						matrizJogador1[coluna][linha].setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/batalhanaval/resources/explosao3.jpg")));
 						
-						if(enviaDados("TIRO;"+linha+";"+coluna)){
-							//JOptionPane.showMessageDialog(null, "Acertou!");
+						int tiro = Integer.parseInt(qtdTiro.getText()) + 1;
+						qtdTiro.setText(Integer.toString(tiro)); 
+						
+						if(enviaDados("TIRO;"+linha+";"+coluna) == 0){
+							matrizJogador1[coluna][linha].setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/batalhanaval/resources/errou.jpg")));
+							
+						}
+						else {
+							matrizJogador1[coluna][linha].setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/batalhanaval/resources/explosao3.jpg")));
 						}
 			        
 			          System.out.println("ATIRANDO NA POSICAO LINHA:"+ linha+" - COLUNA:"+coluna);
@@ -153,6 +180,9 @@ public class Client extends JFrame {
 
 		contentPane.validate();
 		contentPane.repaint();
+		
+		//Zera as estatísticas
+		qtdTiro.setText("0"); 
 	}
 	
 	public int randInt(int min, int max) {
@@ -254,9 +284,14 @@ public class Client extends JFrame {
 		label_1.setBounds(38, 367, 80, 14);
 		contentPane.add(label_1);
 		
-		JLabel label_4 = new JLabel("Porta Avi\u00F5es:");
-		label_4.setFont(new Font("Tahoma", Font.BOLD, 11));
-		label_4.setBounds(38, 352, 80, 14);
-		contentPane.add(label_4);
+		JLabel lblQtdeTiros = new JLabel("Qtde Tiros:");
+		lblQtdeTiros.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblQtdeTiros.setBounds(38, 352, 80, 14);
+		contentPane.add(lblQtdeTiros);
+		
+		
+		qtdTiro.setFont(new Font("Tahoma", Font.BOLD, 12));
+		qtdTiro.setBounds(128, 352, 36, 14);
+		contentPane.add(qtdTiro);
 	}
 }

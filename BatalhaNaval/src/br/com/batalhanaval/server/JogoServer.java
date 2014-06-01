@@ -101,17 +101,32 @@ public class JogoServer extends JFrame {
     	// CONTRA-TORPEDEIROS = 4
     	// SUBMARIO 		  = 5
     	
-    	// POSICIONA O PORTA AVIÕES
-    	int X = randInt(0, 9);
-		int Y = randInt(0, 9);
-		
-		if(tabuleiro[X][Y] == 0){
-			insereLog("Posicionando o porta aviões na posição inicial: X:"+X+" - Y:"+Y);
-			
-			
-			
-		}
+    	distribuiSubmarinos(tabuleiro);
     	
+    	
+    }
+    
+    // Distribui os submarinos o tabuleiro
+    private Boolean distribuiSubmarinos(Integer tabuleiro[][]){
+    	
+    	// 4 submarinos ocupando uma célula
+    	int qtdSubmarinos = 4;
+    	
+    	do {
+			
+    		int X = randInt(0, 9);
+    		int Y = randInt(0, 9);
+    		
+    		if(tabuleiro[X][Y] == 0){
+    			tabuleiro[X][Y] = 5;
+    			qtdSubmarinos --;
+    		}
+    		
+		} while (qtdSubmarinos > 0);
+    	
+    	insereLog("Submarinos Posicionados");
+		
+    	return true;
     }
     
 	public int randInt(int min, int max) {
@@ -190,6 +205,21 @@ public class JogoServer extends JFrame {
         p.println(write);
         p.flush();
     }
+    
+    private Integer atirar(String posicao){
+    	
+    	String[] lsplit = posicao.split(";");
+        int linha = Integer.parseInt(lsplit[0]);
+        int coluna = Integer.parseInt(lsplit[1]);
+        
+        if(matrizJogador2[coluna][linha] == 1) return 1;
+        else if(matrizJogador2[coluna][linha] == 2) return 2;
+        else if(matrizJogador2[coluna][linha] == 3) return 3;
+        else if(matrizJogador2[coluna][linha] == 4) return 4;
+        else if(matrizJogador2[coluna][linha] == 5) return 5; // Acertou submarino
+        
+        else return 0; // Nesse caso atirou na água
+    }
 
     public class EscutaMicro implements Runnable {
 
@@ -222,13 +252,21 @@ public class JogoServer extends JFrame {
             //insereLog("Atirou na posição: X:"+procurarPermisao+" - Y:"+codigoDaPessoa);
 
             switch (param1) {
+            
             case "INICIAR":
             	iniciarPartida();
             	distribuirEmbarcacoes(matrizJogador1);
             	distribuirEmbarcacoes(matrizJogador2);
+            	
+            	retornaDadosCliente("10");
+            	
                 break;
+                
             case "TIRO":
-                //nomeDaPessoa = "Dayvson";
+            	
+                int resposta = atirar(lsplit[1]+";"+lsplit[2]);
+                retornaDadosCliente(Integer.toString(resposta));
+                
                 break;
             
             default:
